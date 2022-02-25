@@ -4,6 +4,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const ScoreDisplay = document.querySelector("#score");
   const StarBtn = document.querySelector("#start-button");
   const width = 10;
+  let nextRandom = 0;
 
   // The Tetrominoes
   const lTetromino = [
@@ -70,15 +71,20 @@ document.addEventListener("DOMContentLoaded", () => {
 
   function freeze() {
     if (
-      current.some((index) => squares[currentPosition + index + width].classList.contains("taken"))
+      current.some((index) =>
+        squares[currentPosition + index + width].classList.contains("taken")
+      )
     ) {
-      current.forEach((index) => squares[currentPosition + index].classList.add("taken"));
-
-      random = Math.floor(Math.random() * theTetrominoes.length);
+      current.forEach((index) =>
+        squares[currentPosition + index].classList.add("taken")
+      );
+      random = nextRandom
+      nextRandom = Math.floor(Math.random() * theTetrominoes.length);
       current = theTetrominoes[random][currentRotation];
       currentPosition = 4;
 
       draw();
+      displayShape()
     }
   }
 
@@ -91,12 +97,16 @@ document.addEventListener("DOMContentLoaded", () => {
 
   function moveLeft() {
     undraw();
-    const isAtLeftEdge = current.some((index) => (currentPosition + index) % width === 0);
+    const isAtLeftEdge = current.some(
+      (index) => (currentPosition + index) % width === 0
+    );
 
     if (!isAtLeftEdge) currentPosition -= 1;
 
     if (
-      current.some((index) => squares[currentPosition + index].classList.contains("taken"))
+      current.some((index) =>
+        squares[currentPosition + index].classList.contains("taken")
+      )
     ) {
       currentPosition += 1;
     }
@@ -105,11 +115,17 @@ document.addEventListener("DOMContentLoaded", () => {
 
   function moveRight() {
     undraw();
-    const isAtRightEdge = current.some((index) => (currentPosition + index) % width === width - 1);
+    const isAtRightEdge = current.some(
+      (index) => (currentPosition + index) % width === width - 1
+    );
 
     if (!isAtRightEdge) currentPosition += 1;
 
-    if (current.some((index) => squares[currentPosition + index].classList.contains("taken"))) {
+    if (
+      current.some((index) =>
+        squares[currentPosition + index].classList.contains("taken")
+      )
+    ) {
       currentPosition -= 1;
     }
 
@@ -140,6 +156,27 @@ document.addEventListener("DOMContentLoaded", () => {
     } else if (e.keyCode === 40) {
       moveDown();
     }
+  }
+
+  const displaySquares = document.querySelectorAll(".mini-grid div");
+  const displayWidth = 4;
+  let displayIndex = 0;
+
+  const upNextTetrominoes = [
+    [1, displayWidth + 1, displayWidth * 2 + 1, 2],
+    [0, displayWidth, displayWidth + 1, displayWidth * 2 + 1],
+    [1, displayWidth, displayWidth + 1, displayWidth + 2],
+    [0, 1, displayWidth, displayWidth + 1],
+    [1, displayWidth + 1, displayWidth * 2 + 1, displayWidth * 3 + 1],
+  ];
+
+  function displayShape() {
+    displaySquares.forEach((square) => {
+      square.classList.remove("tetromino");
+    });
+    upNextTetrominoes[nextRandom].forEach((index) => 
+      displaySquares[displayIndex + index].classList.add("tetromino")
+    );
   }
 
   document.addEventListener("keyup", control);
